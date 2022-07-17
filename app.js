@@ -85,18 +85,39 @@ app.post("/", function (req, respondant) {
     console.log(`STATUS: ${res.statusCode}`);
     console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
     res.setEncoding('utf8');
-    res.on('data', (chunk) => {
-      console.log(`BODY: ${chunk}`);
-      console.log(data);
+    var Rdat;
+    var nMem;
+    var count;
+    res.on('data', function (data) {
+      console.log(JSON.parse(data));
+      Rdat = JSON.parse(data);
+      console.log("New Members JSON Data:" + Rdat.new_members.length);
+      console.log('Error Count JSON Data:' + Rdat.error_count);
+      try {
+        count = Rdat.error_count
+      } catch (error) {
+        count = 0
+      }
+      try {
+        nMem = Rdat.new_members.length
+      } catch (error) {
+        nMem == 0;
+      }
+      console.log("nMem: " + nMem);
+      console.log("count: " + count);
 
+      if (count === 0 && nMem >= 1) {
+        console.log(nMem);
+        respondant.redirect('/success');
+        console.log("success");
+      } else {
+         respondant.redirect('/failure');
+        console.log("failure");};
     });
 
-    var d = JSON.stringify(res.error_count)
 
 
-    if (d === 0) {
-      respondant.redirect('/success');
-    } else { respondant.redirect('/failure'); };
+
 
     res.on('end', () => {
       console.log('No more data in response.');
